@@ -1,0 +1,122 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 650,
+  "height": 450,
+  "title": "Heritage Sites of NSW Government Schools in 2020",
+  
+  "params": [
+    {
+      "name": "EndorsedSignificanceSelection",
+      "bind": {
+        "input": "range",
+        "min": 0,
+        "max": 4,
+        "step": 1,
+        "name": "Select Endorsed Significance: "
+      },
+      "value": 0
+    }
+  ],
+  
+  "projection": {
+    "type": "equirectangular",
+    "center": [149.2, -33.5],
+    "scale": 2000
+  },
+  "layer": [
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/FIT3179/Vega-Lite/main/2_symbol_map/js/WorldMapWithGraticules.topojson",
+        "format": {
+          "type": "topojson",
+          "feature": "ne_110m_admin_0_countries"
+        }
+      },
+      "mark": {
+        "type": "geoshape",
+        "fill": "lightgoldenrodyellow",  
+        "stroke": "white"
+      }
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/thisstewisstu/fit3179/refs/heads/main/json/aus_map_with_states.json",
+        "format": {
+          "type": "topojson",
+          "feature": "states"
+        }
+      },
+      "mark": {
+        "type": "geoshape",
+        "fill": "lightgoldenrodyellow",
+        "stroke": "gold",
+        "strokeWidth": 1.1
+      }
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/thisstewisstu/fit3179/refs/heads/main/json/map_graticules.json",
+        "format": {
+          "type": "topojson",
+          "feature": "ne_110m_graticules_1"
+        }
+      },
+      "mark": {
+        "type": "geoshape",
+        "fill": null,
+        "stroke": "lightgray"
+      }
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/thisstewisstu/fit3179/refs/heads/main/data/merged_schools_data.csv",
+        "format": {"type": "csv"}
+      },
+      "transform": [
+        {
+          "calculate": "datum.ItemName != '' ? datum.ItemName : null", 
+          "as": "ConditionalItemName"
+        },
+        {
+          "filter": "datum.EndorsedSignificance == EndorsedSignificanceSelection"
+        }
+      ],
+      "mark": {
+        "type": "circle"
+      },
+      "encoding": {
+        "longitude": {"field": "Longitude", "type": "quantitative"},
+        "latitude": {"field": "Latitude", "type": "quantitative"},
+        "size": {
+          "field": "EndorsedSignificance",
+          "type": "quantitative",
+          "title": "Endorsed Significance",
+          "scale": {
+            "domain": [0, 1, 2, 3, 4],  
+            "range": [30, 50, 100, 200, 300]
+          },
+          "legend": {
+            "title": "Endorsed Significance",
+            "values": [0, 1, 2, 3, 4]  
+          }
+        },
+        "color": {
+          "field": "HeritageTypeName",
+          "type": "nominal",
+          "title": "Heritage Type",
+          "scale": {
+            "domain": ["Built", "Complex / Group", "Landscape", "Archaeological-Terrestrial", "Movable / Collection"],
+            "range": ["#f3798c", "#cc77ed", "#6464f6", "#83e796", "#ac6c53"]
+          }
+        },
+        "tooltip": [
+          {"field": "SchoolName", "type": "nominal", "title": "School Name"},
+          {"field": "ConditionalItemName", "type": "nominal", "title": "Heritage Item(s)"},
+          {"field": "HeritageTypeName", "type": "nominal", "title": "Heritage Type"},
+          {"field": "EndorsedSignificance", "type": "nominal", "title": "Endorsed Significance"},
+          {"field": "LocalGovtAreaName", "type": "nominal", "title": "Local Government Area"}
+        ]
+      }
+    }
+  ]
+}
